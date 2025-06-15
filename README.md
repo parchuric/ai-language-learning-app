@@ -7,8 +7,6 @@ The project leverages Azure AI services for its core functionalities and is desi
 **🌐 LIVE APPLICATION URL (if deployed via `deploy-fixed-complete.ps1` or similar):**
 `http://[YOUR_ACI_NAME].[YOUR_REGION].azurecontainer.io:8000` (Replace placeholders with your ACI details)
 
-**(Note: The initial section of your README regarding deployment status and options is very useful; I'll retain its essence but integrate it into a more standard README flow below.)**
-
 ## Table of Contents
 - [Key Features](#key-features-)
 - [Technology Stack](#technology-stack-)
