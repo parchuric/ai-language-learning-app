@@ -279,9 +279,41 @@ This is the primary cloud deployment method for this project.
     Example using a script:
     ```powershell
     # Ensure script variables (resource group, ACR name, ACI name, image tag, env vars) are correct
-    .\deploy-fixed-complete.ps1
+    .\scripts\deploy-fixed-complete.ps1
     ```
     The script should output the public IP address or FQDN of your ACI.
+
+### Option 4: Other Azure Deployment Considerations
+
+While Azure Container Instances (ACI) is the primary deployment target for simplicity and quick startup, you might consider other Azure services depending on evolving requirements:
+
+*   **Azure App Service (for Containers):**
+    *   **Description:** A fully managed platform (PaaS) for building, deploying, and scaling web apps. It directly supports containerized applications.
+    *   **Pros:** Rich PaaS features like auto-scaling, custom domains, SSL management, deployment slots, integrated CI/CD, and monitoring.
+    *   **Considerations:**
+        *   Typically involves an App Service Plan which has associated costs (though free/basic tiers exist with limitations).
+        *   **Note:** We previously encountered Azure subscription quota limitations with App Service plans in certain regions/tiers, which led to prioritizing ACI for this project's initial deployment. This should be re-evaluated if App Service becomes a preferred option.
+        *   Might be more than needed for a simple, single-container application if ACI's features suffice.
+    *   **When to Consider:** If you need more robust PaaS features, easier scaling, or deeper integration with Azure DevOps/GitHub Actions for CI/CD beyond what ACI offers out-of-the-box.
+
+*   **Azure Kubernetes Service (AKS):**
+    *   **Description:** A managed Kubernetes service for orchestrating containerized applications at scale.
+    *   **Pros:** Maximum flexibility, control, and scalability for complex microservices architectures. Rich ecosystem and community support.
+    *   **Considerations:**
+        *   Significantly more complex to set up and manage than ACI or App Service.
+        *   Higher operational overhead and potentially higher cost due to the control plane and node infrastructure.
+        *   Likely overkill for this application in its current state unless significant scaling or microservice decomposition is planned.
+    *   **When to Consider:** For large-scale deployments, microservices, or when a standardized Kubernetes environment is required across multiple applications.
+
+*   **Azure Functions (with Custom Containers):**
+    *   **Description:** A serverless compute service that can run custom Docker containers.
+    *   **Pros:** Event-driven, pay-per-execution model (can be cost-effective for sporadic workloads).
+    *   **Considerations:**
+        *   Streamlit applications are typically long-running web servers, which might not align perfectly with the Azure Functions consumption model unless the app is re-architected or a Premium/Dedicated plan is used (which changes the cost model).
+        *   Cold starts can be an issue for user-facing interactive applications.
+    *   **When to Consider:** If parts of the application could be broken down into event-driven functions, or for specific backend processing tasks rather than hosting the primary UI.
+
+These options provide a roadmap for scaling or adapting the deployment strategy as the application's needs grow or change.
 
 ## Contributing 🤝
 
