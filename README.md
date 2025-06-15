@@ -51,8 +51,6 @@ Below is a visual representation of the application's architecture:
 
 ![AI Language Learning App Architecture](./docs/images/MultiAgentArchitecture-AI%20Based%20Language%20Learn%20App.png)
 
-*(The Mermaid diagram previously in the "Application Architecture" section can be considered a more detailed logical flow of the backend components and Azure interactions.)*
-
 ## Project Structure 📁
 
 The project is organized as follows:
