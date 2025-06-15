@@ -34,7 +34,7 @@ This project is built using a combination of modern technologies and cloud servi
 
 *   **Python:** The core programming language for the backend logic and AI integrations.
 *   **Streamlit:** A Python framework for building and sharing web apps for data science and machine learning projects. Used here for the frontend UI.
-*   **LangGraph:** A library for building stateful, multi-actor applications with Large Language Models (LLMs). It helps define and execute the AI pipeline as a graph.
+*   **LangGraph:** A library for building stateful, multi-actor applications with Large Language Models (LLMs). It helps define and execute the AI pipeline as a graph. Manages the AI workflow and operations pipeline, ensuring smooth orchestration of moderation, translation, and speech synthesis.
 *   **Azure AI Services:**
     *   **Azure OpenAI Service:** Provides access to powerful language models (e.g., GPT-4o) for translation capabilities.
     *   **Azure AI Speech Service:** Offers text-to-speech (TTS) capabilities to convert translated text into audio.
