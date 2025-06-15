@@ -1,0 +1,112 @@
+# Environment variables
+.env
+*.env
+*.env.*
+env/
+venv/
+ENV/
+VENV/
+.venv/
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.backup
+*.tfplan
+.terraform/
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+plan.out
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+*.ipynb_checkpoints
+
+# Deployment artifacts
+deployment.zip
+*.zip
+
+# Docker Compose override file
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# Specific analysis files (if not intended for general version control)
+DEPLOYMENT-ISSUE-ANALYSIS.md
+
+# VS Code
+.vscode/
+
+# IDE specific
+.idea/
+*.iml
+nbproject/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Azure
+.azure/
+
+# Local run files
+streamlit_app_runner.py # If you have local runner scripts not meant for repo
+
+# Test outputs
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# PowerShell scripts with secrets (use .template.ps1 versions for committing)
+# These paths assume the scripts are in a 'scripts' subfolder
+scripts/deploy-fixed-complete.ps1
+scripts/deploy-aci-acr-build.ps1
+scripts/deploy-with-credentials.ps1
+
+# If you have other .ps1 files directly in the scripts folder that contain secrets
+# and do not have a .template version, add them here too, e.g.:
+# scripts/my-secret-utility.ps1
+
+# Audio files (e.g., test outputs, large samples)
+*.mp3

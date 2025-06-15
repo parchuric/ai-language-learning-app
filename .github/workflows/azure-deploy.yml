@@ -1,0 +1,140 @@
+name: Deploy AI Language Learning App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  AZURE_WEBAPP_NAME: ailangapp-appservice
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  PYTHON_VERSION: '3.11'
+  ACR_NAME: ailangappregistry
+  IMAGE_NAME: ai-language-app
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python version
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Create and start virtual environment
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+
+    - name: Install dependencies
+      run: |
+        source venv/bin/activate
+        pip install -r requirements.txt
+
+    - name: Lint with flake8
+      run: |
+        source venv/bin/activate
+        pip install flake8
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Upload artifact for deployment jobs
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-app
+        path: |
+          .
+          !venv/
+          !.git/
+          !.github/
+          !terraform/
+          !.env
+  deploy-container:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Container-Production'
+      url: ${{ steps.deploy-to-aci.outputs.app-url }}
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v3
+      with:
+        name: python-app
+        path: .
+
+    - name: 'Login to Azure'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 'Build and push Docker image to ACR'
+      id: build-image
+      run: |
+        # Login to ACR
+        az acr login --name ${{ env.ACR_NAME }}
+        
+        # Build and push image
+        docker build -t ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+        docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        
+        echo "image=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> $GITHUB_OUTPUT    - name: 'Deploy to Azure Container Instances'
+      id: deploy-to-aci
+      run: |
+        az container create \
+          --resource-group ai-language-app-rg \
+          --name ailangapp-container-${{ github.sha }} \
+          --image ${{ steps.build-image.outputs.image }} \
+          --dns-name-label ailangapp-${{ github.run_number }} \
+          --ports 8000 \
+          --memory 2 \
+          --cpu 1 \
+          --os-type Linux \
+          --environment-variables \
+            AZURE_OPENAI_ENDPOINT="https://ailangapp-openai.openai.azure.com/" \
+            AZURE_OPENAI_DEPLOYMENT_NAME="gpt-4o" \
+            AZURE_SPEECH_REGION="eastus" \
+            KEY_VAULT_URI="https://ailangapp-kv.vault.azure.net/" \
+            AZURE_SPEECH_KEY_SECRET_NAME="ailangapp-speech-key" \
+            AZURE_CONTENT_SAFETY_ENDPOINT="https://eastus.api.cognitive.microsoft.com/"
+        
+        FQDN=$(az container show --resource-group ai-language-app-rg --name ailangapp-container-${{ github.sha }} --query "ipAddress.fqdn" --output tsv)
+        echo "app-url=http://${FQDN}:8000" >> $GITHUB_OUTPUT
+
+  deploy-webapp:
+    permissions:
+      contents: none
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'WebApp-Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v3
+      with:
+        name: python-app
+        path: .
+
+    - name: 'Deploy to Azure Web App (Manual Only)'
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
