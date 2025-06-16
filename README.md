@@ -47,7 +47,7 @@ This project is built using a combination of modern technologies and cloud servi
 
 Below is a visual representation of the application's architecture:
 
-![AI Language Learning App Architecture](./docs/images/MultiAgentArchitecture-AI%20Based%20Language%20Learn%20App.png)
+![AI Language Learning App Architecture](./docs/images/AIBasedLanguageLearnApp.png)
 
 ## Project Structure 📁
 
