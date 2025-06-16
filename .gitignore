@@ -57,6 +57,7 @@ docker-compose.override.yaml
 
 # Specific analysis files (if not intended for general version control)
 DEPLOYMENT-ISSUE-ANALYSIS.md
+PROJECT-DECISIONS.md
 
 # VS Code
 .vscode/
